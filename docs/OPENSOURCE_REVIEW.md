@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-**LiveAccentCoach** has been thoroughly reviewed and **is technically feasible within the 5-day sprint**. Three key open-source projects are recommended for integration, covering core features:
+**Northstack** has been thoroughly reviewed and **is technically feasible within the 5-day sprint**. Three key open-source projects are recommended for integration, covering core features:
 
 | Feature Area | Recommended Project | Integration Priority | Reason |
 |---|---|---|---|

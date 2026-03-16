@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>LiveAccentCoach — Gemini Live</title>
+        <title>Northstack — Gemini Live</title>
         <meta name="description" content="Real-time multimodal AI with Gemini Live API" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

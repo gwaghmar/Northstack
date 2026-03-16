@@ -1,5 +1,5 @@
 """
-LiveAccentCoach MCP Server
+Northstack MCP Server
 Exposes memory, knowledge, personas, files, and history as MCP tools
 so any MCP-compatible client (Claude Desktop, Cursor, etc.) can use them.
 
@@ -22,10 +22,10 @@ DATA_DIR = BASE_DIR / "data"
 SAMPLES_DIR = DATA_DIR / "samples"
 
 mcp = FastMCP(
-    "LiveAccentCoach",
+    "Northstack",
     instructions=(
         "Tools for accessing memory, knowledge, personas, files, and session history "
-        "from the LiveAccentCoach AI agent system."
+        "from the Northstack AI agent system."
     ),
 )
 
@@ -153,5 +153,5 @@ def get_session_history(limit: int = 10) -> str:
 
 
 if __name__ == "__main__":
-    print("Starting LiveAccentCoach MCP server...")
+    print("Starting Northstack MCP server...")
     mcp.run()

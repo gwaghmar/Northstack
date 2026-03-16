@@ -1,11 +1,11 @@
 @echo off
-REM LiveAccentCoach Setup Script for Windows
+REM Northstack Setup Script for Windows
 REM Sets up both backend and frontend for development
 
 setlocal enabledelayedexpansion
 
 echo.
-echo 🚀 LiveAccentCoach Setup
+echo 🚀 Northstack Setup
 echo ========================
 echo.
 

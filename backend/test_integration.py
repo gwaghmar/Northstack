@@ -1,5 +1,5 @@
 """
-Integration test script for LiveAccentCoach
+Integration test script for Northstack
 Verifies all components and services work correctly
 """
 
@@ -170,7 +170,7 @@ async def test_cloud_storage_service():
 if __name__ == "__main__":
     # Run tests synchronously since we removed async operations
     print("=" * 50)
-    print("LiveAccentCoach Integration Test Suite")
+    print("Northstack Integration Test Suite")
     print("=" * 50)
     
     try:
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         print("\n" + "=" * 50)
         print("[SUCCESS] ALL TESTS PASSED!")
         print("=" * 50)
-        print("\n[START] Your LiveAccentCoach backend is ready!")
+        print("\n[START] Your Northstack backend is ready!")
         print("Run: python main.py")
         print("\nNote: Firestore and Cloud Storage will use local fallback mode")
         print("until GCP credentials are configured in .env")

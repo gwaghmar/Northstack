@@ -1,4 +1,4 @@
-# LiveAccentCoach Architecture
+# Northstack Architecture
 
 ## High-Level Architecture Diagram
 This diagram illustrates the real-time flow of audio and visual data between the frontend Next.js application, the backend FastAPI server, the Gemini Live API, and underlying Google Cloud infrastructure.
