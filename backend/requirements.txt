@@ -5,7 +5,7 @@ google-adk>=1.0.0
 websockets>=15.0.1,<16
 python-dotenv==1.0.0
 firebase-admin==6.4.0
-google-cloud-storage==2.16.0
+google-cloud-storage>=2.18.0
 pydantic>=2.7.0
 pydantic-settings>=2.1.0
 aiofiles==23.2.1
