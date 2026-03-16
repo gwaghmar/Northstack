@@ -115,6 +115,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "https://voice-fit-ai-aa060.web.app",
+        "https://voice-fit-ai-aa060.firebaseapp.com",
         os.getenv("FRONTEND_URL", ""),
     ],
     allow_credentials=True,
