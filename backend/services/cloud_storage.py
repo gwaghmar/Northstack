@@ -70,6 +70,55 @@ class CloudStorageService:
         file_path.write_bytes(audio_data)
         return str(file_path)
     
+    def _list_files_sync(self, prefix: str = "") -> list:
+        if self._bucket is not None:
+            blobs = self._client.list_blobs(self.bucket_name, prefix=prefix or "data/samples/")
+            return [
+                {
+                    "name": blob.name,
+                    "size": blob.size,
+                    "updated": blob.updated.isoformat() if blob.updated else None,
+                    "source": "gcs",
+                }
+                for blob in blobs
+            ]
+        # Local fallback: list files in data/samples/
+        samples_dir = Path(__file__).resolve().parents[1] / "data" / "samples"
+        if not samples_dir.exists():
+            return []
+        return [
+            {"name": f.name, "size": f.stat().st_size, "updated": None, "source": "local"}
+            for f in sorted(samples_dir.iterdir())
+            if f.is_file()
+        ]
+
+    async def list_files(self, prefix: str = "") -> list:
+        try:
+            return await asyncio.to_thread(self._list_files_sync, prefix)
+        except Exception as e:
+            logger.error(f"Error listing files: {e}")
+            return []
+
+    def _read_file_sync(self, filename: str) -> Optional[str]:
+        if self._bucket is not None:
+            blob = self._bucket.blob(filename)
+            return blob.download_as_text()
+        # Local fallback — restrict to data/samples/ to avoid path traversal
+        samples_dir = Path(__file__).resolve().parents[1] / "data" / "samples"
+        file_path = (samples_dir / Path(filename).name).resolve()
+        if not str(file_path).startswith(str(samples_dir.resolve())):
+            return None
+        if file_path.exists():
+            return file_path.read_text(encoding="utf-8")
+        return None
+
+    async def read_file(self, filename: str) -> Optional[str]:
+        try:
+            return await asyncio.to_thread(self._read_file_sync, filename)
+        except Exception as e:
+            logger.error(f"Error reading file: {e}")
+            return None
+
     async def upload_session_recording(self, user_id: str, session_id: str, audio_data: bytes) -> Optional[str]:
         """
         Upload session recording to Cloud Storage

@@ -1,10 +1,10 @@
 #!/bin/bash
-# LiveAccentCoach Setup Script
+# Northstack Setup Script
 # Sets up both backend and frontend for development
 
 set -e
 
-echo "🚀 LiveAccentCoach Setup"
+echo "🚀 Northstack Setup"
 echo "========================"
 
 # Backend Setup

@@ -16,8 +16,10 @@ import { MEDIAPIPE_CONFIG } from '../utils/constants';
 export function useMediaPipe(videoRef: React.RefObject<HTMLVideoElement>) {
   const [faceLandmarks, setFaceLandmarks] = useState<FaceLandmarks | null>(null);
   const [handLandmarks, setHandLandmarks] = useState<HandLandmarks | null>(null);
+  // Start as ready so the app isn't blocked if MediaPipe/camera fails
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [skipped, setSkipped] = useState(false);
 
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);

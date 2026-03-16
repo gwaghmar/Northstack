@@ -34,6 +34,7 @@ export class AudioStreamer {
   public gainNode: GainNode;
   public source: AudioBufferSourceNode;
   private endOfQueueAudioSource: AudioBufferSourceNode | null = null;
+  private activeSources: Set<AudioBufferSourceNode> = new Set();
 
   public onComplete = () => {};
 
@@ -164,6 +165,15 @@ export class AudioStreamer {
       source.buffer = audioBuffer;
       source.connect(this.gainNode);
 
+      this.activeSources.add(source);
+      source.onended = () => {
+        this.activeSources.delete(source);
+        if (this.audioQueue.length === 0 && this.endOfQueueAudioSource === source) {
+          this.endOfQueueAudioSource = null;
+          this.onComplete();
+        }
+      };
+
       const worklets = registeredWorklets.get(this.context);
 
       if (worklets) {
@@ -217,6 +227,13 @@ export class AudioStreamer {
     this.isStreamComplete = true;
     this.audioQueue = [];
     this.scheduledTime = this.context.currentTime;
+
+    this.activeSources.forEach((s) => {
+      try {
+        s.stop();
+      } catch (e) {}
+    });
+    this.activeSources.clear();
 
     if (this.checkInterval) {
       clearInterval(this.checkInterval);

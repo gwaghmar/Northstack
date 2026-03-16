@@ -40,5 +40,52 @@
     "best_accuracy": 0,
     "scores": [],
     "saved_at": "2026-03-14T05:58:55.546502+00:00"
+  },
+  {
+    "session_id": "test-session-123",
+    "duration": 120,
+    "average_accuracy": 85,
+    "num_utterances": 5,
+    "user_id": "test-user",
+    "saved_at": "2026-03-14T19:18:30.142196+00:00"
+  },
+  {
+    "session_id": "test-session-123",
+    "duration": 120,
+    "average_accuracy": 85,
+    "num_utterances": 5,
+    "user_id": "test-user",
+    "saved_at": "2026-03-14T19:19:13.758777+00:00"
+  },
+  {
+    "session_id": "4ef752fe-b39b-4225-b3cb-7453388989e2",
+    "user_id": "9e611b6e-5e1e-45d1-b793-43904886a614",
+    "duration": 44.025049,
+    "num_utterances": 0,
+    "average_accuracy": 0,
+    "best_accuracy": 0,
+    "scores": [],
+    "saved_at": "2026-03-16T01:46:19.182125+00:00"
+  },
+  {
+    "session_id": "ea7d7746-d9c5-4e2a-813f-2ec289704112",
+    "user_id": "38ee5119-322a-404f-8965-4ff6d7998434",
+    "duration": 40.011764,
+    "num_utterances": 0,
+    "average_accuracy": 0,
+    "best_accuracy": 0,
+    "scores": [],
+    "recording_url": "C:\\Users\\govin\\Downloads\\LiveAccentCoach\\LiveAccentCoach\\backend\\data\\recordings\\38ee5119-322a-404f-8965-4ff6d7998434\\ea7d7746-d9c5-4e2a-813f-2ec289704112.wav",
+    "saved_at": "2026-03-16T01:51:51.430441+00:00"
+  },
+  {
+    "session_id": "3895d6ef-17ff-4d5c-8721-52690a5ffcf3",
+    "user_id": "70e88f02-49de-4abf-9ff9-68de60d76842",
+    "duration": 26.774621,
+    "num_utterances": 0,
+    "average_accuracy": 0,
+    "best_accuracy": 0,
+    "scores": [],
+    "saved_at": "2026-03-16T03:59:54.701688+00:00"
   }
 ]

@@ -2,14 +2,14 @@
  * LeftPanel.tsx
  * Left sidebar: Personas (Personal/Work), Storage, History, Enterprise, Settings, Profile.
  */
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLiveAPIContext } from "@/contexts/LiveAPIContext";
 import CustomPersonaDialog, { CustomPersona } from "@/components/custom-persona/CustomPersonaDialog";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const PERSONAL_PERSONAS = [
-  { id: "accent_coach", label: "Accent Coach", icon: "record_voice_over" },
+  { id: "accent_coach", label: "Northstack Coach", icon: "record_voice_over" },
   { id: "workout", label: "Workout Coach", icon: "fitness_center" },
 ];
 
@@ -166,7 +166,7 @@ export default function LeftPanel({ selectedRole, onRoleSelect }: LeftPanelProps
     onRoleSelect(persona.id);
   };
 
-  const handleDeleteCustomPersona = (id: string, e: React.MouseEvent) => {
+  const handleDeleteCustomPersona = (id: string, e: React.MouseEvent<HTMLSpanElement>) => {
     e.stopPropagation();
     const updated = customPersonas.filter((p) => p.id !== id);
     setCustomPersonas(updated);

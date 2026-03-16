@@ -1,135 +1,100 @@
 /**
- * useAudioStream hook
- * Captures microphone audio and encodes it for transmission
+ * useAudioStream
+ * Captures microphone as 16-bit PCM 16 kHz using an AudioWorklet processor.
+ * Zero-copy: each chunk is transferred as an ArrayBuffer to the callback.
+ *
+ * Drop-in replacement for the old ScriptProcessorNode-based version.
+ * The callback now receives Uint8Array (same as before for backwards compat).
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { AudioProcessor, AudioWorkletProcessor } from '../utils/audioProcessor';
-import { AUDIO_CONFIG } from '../utils/constants';
 
 export function useAudioStream(onAudioChunk: (data: Uint8Array) => void) {
   const [isStreaming, setIsStreaming] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [volume, setVolume] = useState(0);
+  const [error, setError]             = useState<string | null>(null);
+  const [volume, setVolume]           = useState(0);
 
-  const audioProcessorRef = useRef<AudioWorkletProcessor | null>(null);
-  const analyzerRef = useRef<AnalyserNode | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
-  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-
-  const startStream = useCallback(async () => {
-    try {
-      // Ensure any existing stream is cleaned before starting a new one.
-      if (audioContextRef.current || mediaStreamRef.current) {
-        if (scriptProcessorRef.current) {
-          scriptProcessorRef.current.onaudioprocess = null;
-          scriptProcessorRef.current.disconnect();
-        }
-        if (sourceRef.current) {
-          sourceRef.current.disconnect();
-        }
-        if (mediaStreamRef.current) {
-          mediaStreamRef.current.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-        }
-        if (audioContextRef.current) {
-          await audioContextRef.current.close();
-        }
-      }
-
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
-        sampleRate: AUDIO_CONFIG.SAMPLE_RATE,
-      });
-      audioContextRef.current = audioContext;
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: false,
-          sampleRate: AUDIO_CONFIG.SAMPLE_RATE,
-        },
-      });
-      mediaStreamRef.current = stream;
-
-      const source = audioContext.createMediaStreamSource(stream);
-      sourceRef.current = source;
-      const scriptProcessor = audioContext.createScriptProcessor(AUDIO_CONFIG.CHUNK_SIZE, 1, 1);
-      scriptProcessorRef.current = scriptProcessor;
-
-      // Create analyzer for volume visualization
-      const analyzer = audioContext.createAnalyser();
-      analyzer.fftSize = 256;
-      analyzerRef.current = analyzer;
-      source.connect(analyzer);
-      source.connect(scriptProcessor);
-      scriptProcessor.connect(audioContext.destination);
-
-      scriptProcessor.onaudioprocess = (event) => {
-        const inputData = event.inputBuffer.getChannelData(0);
-        
-        // Calculate volume
-        let sum = 0;
-        for (let i = 0; i < inputData.length; i++) {
-          sum += inputData[i] * inputData[i];
-        }
-        const rms = Math.sqrt(sum / inputData.length);
-        setVolume(Math.min(100, rms * 500));
-
-        // Convert to PCM
-        const int16Data = new Int16Array(inputData.length);
-        for (let i = 0; i < inputData.length; i++) {
-          const s = Math.max(-1, Math.min(1, inputData[i]));
-          int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-        }
-
-        const bytes = new Uint8Array(int16Data.buffer);
-        onAudioChunk(bytes);
-      };
-
-      setIsStreaming(true);
-      setError(null);
-    } catch (err) {
-      setError(`Failed to start audio stream: ${err}`);
-      console.error('Audio stream error:', err);
-    }
-  }, [onAudioChunk]);
+  const ctxRef      = useRef<AudioContext | null>(null);
+  const workletRef  = useRef<AudioWorkletNode | null>(null);
+  const streamRef   = useRef<MediaStream | null>(null);
+  const sourceRef   = useRef<MediaStreamAudioSourceNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const volTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cbRef       = useRef(onAudioChunk);
+  useEffect(() => { cbRef.current = onAudioChunk; }, [onAudioChunk]);
 
   const stopStream = useCallback(() => {
-    if (scriptProcessorRef.current) {
-      scriptProcessorRef.current.onaudioprocess = null;
-      scriptProcessorRef.current.disconnect();
-      scriptProcessorRef.current = null;
-    }
-    if (sourceRef.current) {
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
-    }
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-      mediaStreamRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-
+    if (volTimerRef.current)  { clearInterval(volTimerRef.current);  volTimerRef.current  = null; }
+    if (workletRef.current)   { workletRef.current.disconnect();     workletRef.current   = null; }
+    if (analyserRef.current)  { analyserRef.current.disconnect();    analyserRef.current  = null; }
+    if (sourceRef.current)    { sourceRef.current.disconnect();      sourceRef.current    = null; }
+    if (streamRef.current)    { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+    if (ctxRef.current)       { ctxRef.current.close();              ctxRef.current       = null; }
     setIsStreaming(false);
     setVolume(0);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      stopStream();
-    };
+  const startStream = useCallback(async () => {
+    stopStream(); // clean up any previous session
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000,
+        },
+      });
+      streamRef.current = stream;
+
+      const ctx = new AudioContext({ sampleRate: 16000 });
+      ctxRef.current = ctx;
+
+      // Load the worklet processor from /public
+      await ctx.audioWorklet.addModule('/pcm-recorder-processor.js');
+
+      const source  = ctx.createMediaStreamSource(stream);
+      sourceRef.current = source;
+
+      const worklet = new AudioWorkletNode(ctx, 'pcm-recorder-processor');
+      workletRef.current = worklet;
+
+      // Receive Int16 ArrayBuffer chunks from the worklet
+      worklet.port.onmessage = (e: MessageEvent<ArrayBuffer>) => {
+        cbRef.current(new Uint8Array(e.data));
+      };
+
+      // Volume analyser
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyserRef.current = analyser;
+      source.connect(analyser);
+      source.connect(worklet);
+      worklet.connect(ctx.destination);  // required to keep worklet alive in some browsers
+
+      // Poll volume ~15 fps
+      const buf = new Uint8Array(analyser.frequencyBinCount);
+      volTimerRef.current = setInterval(() => {
+        analyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) {
+          const v = (buf[i] - 128) / 128;
+          sum += v * v;
+        }
+        setVolume(Math.min(100, Math.sqrt(sum / buf.length) * 500));
+      }, 66);
+
+      setIsStreaming(true);
+      setError(null);
+    } catch (err) {
+      setError(`Failed to start mic: ${err}`);
+      console.error('useAudioStream error:', err);
+    }
   }, [stopStream]);
 
-  return {
-    isStreaming,
-    error,
-    volume,
-    startStream,
-    stopStream,
-  };
+  // Clean up on unmount
+  useEffect(() => () => stopStream(), [stopStream]);
+
+  return { isStreaming, error, volume, startStream, stopStream };
 }

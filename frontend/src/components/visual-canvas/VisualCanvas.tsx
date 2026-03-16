@@ -7,7 +7,7 @@ import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
 import { FunctionDeclaration, LiveServerToolCall, Type } from '@google/genai';
 
 export const RENDER_VISUAL_DECLARATION: FunctionDeclaration = {
-  name: 'render_visual',
+  name: 'generate_visual_aid',
   description:
     'Renders an interactive HTML visualization, diagram, chart, or explanation in the main display area. ' +
     'Use this whenever asked to "show", "visualize", "draw", "explain visually", or "create a diagram". ' +
@@ -42,7 +42,7 @@ function VisualCanvasComponent() {
 
   useEffect(() => {
     const onToolCall = (toolCall: LiveServerToolCall) => {
-      const fc = toolCall.functionCalls?.find((fc) => fc.name === 'render_visual');
+      const fc = toolCall.functionCalls?.find((fc) => fc.name === 'generate_visual_aid');
       if (!fc) return;
       const args = fc.args as any;
       setVisual({ html: args.html || '', title: args.title || 'Visual' });

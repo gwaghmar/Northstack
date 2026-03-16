@@ -148,16 +148,30 @@ function ControlTray({
         </div>
       )}
       <nav className="actions-nav">
-        {/* Mic — primary action: connect or mute */}
-        <button
-          className={cn("action-button mic-button", { "mic-button--muted": muted && connected })}
-          onClick={handleMicClick}
-          title={!connected ? "Start session" : muted ? "Unmute" : "Mute"}
-        >
-          <span className="material-symbols-outlined filled">
-            {!connected ? "mic" : muted ? "mic_off" : "mic"}
-          </span>
-        </button>
+        {/* Primary Connect Button */}
+        {!connected && (
+          <button
+            className="action-button action-button--connect"
+            onClick={connect}
+            title="Start session"
+          >
+            <span className="material-symbols-outlined filled">play_arrow</span>
+            <span className="button-text">Start Coaching</span>
+          </button>
+        )}
+
+        {/* Mic — only shown when connected, used for muting */}
+        {connected && (
+          <button
+            className={cn("action-button mic-button", { "mic-button--muted": muted })}
+            onClick={() => setMuted((m) => !m)}
+            title={muted ? "Unmute" : "Mute"}
+          >
+            <span className="material-symbols-outlined filled">
+              {muted ? "mic_off" : "mic"}
+            </span>
+          </button>
+        )}
 
         {/* Stop — only shown when connected */}
         {connected && (

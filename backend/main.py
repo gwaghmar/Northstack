@@ -1,5 +1,5 @@
 """
-LiveAccentCoach Backend - FastAPI server for real-time pronunciation coaching
+Northstack Backend - FastAPI server for real-time pronunciation coaching
 Main entry point for WebSocket connections and HTTP endpoints
 """
 
@@ -70,7 +70,7 @@ openclaw_service = OpenClawService(config.OPENCLAW_URL, config.OPENCLAW_TOKEN) i
 ws_handler = WebSocketHandler() if LEGACY_AVAILABLE else None
 
 # ── ADK setup for direct chat ─────────────────────────────────────────────────
-ADK_APP_NAME = "live-accent-coach"
+ADK_APP_NAME = "northstack"
 if ADK_AVAILABLE and LEGACY_AVAILABLE and direct_agent is not None:
     _adk_session_service = InMemorySessionService()
     _direct_runner = Runner(
@@ -88,7 +88,7 @@ async def lifespan(app: FastAPI):
     global firestore_service, cloud_storage_service
     
     # Startup
-    logger.info("Starting LUMINA backend...")
+    logger.info("Starting Northstack backend...")
     firestore_service = FirestoreService(config.GCP_PROJECT_ID) if LEGACY_AVAILABLE else None
     cloud_storage_service = CloudStorageService(config.GCS_BUCKET_NAME) if LEGACY_AVAILABLE else None
     logger.info("Backend started successfully")

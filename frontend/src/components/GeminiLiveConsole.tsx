@@ -183,6 +183,7 @@ function AppContent({
                 ref={videoRef}
                 autoPlay
                 playsInline
+                style={{ transform: 'scaleX(-1)' }}
               />
 
               {/* Landing: quick-start cards */}

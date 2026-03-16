@@ -20,6 +20,7 @@ export function useWebSocket() {
   const [error, setError] = useState<string | null>(null);
   const [lastResponse, setLastResponse] = useState<CoachingResponse | null>(null);
   const messageHandlerRef = useRef<((data: any) => void) | null>(null);
+  const audioBytesHandlerRef = useRef<((pcmBytes: ArrayBuffer) => void) | null>(null);
 
   const uint8ToBase64 = (bytes: Uint8Array): string => {
     let binary = '';
@@ -33,17 +34,17 @@ export function useWebSocket() {
 
   const normalizeResponse = (data: any): CoachingResponse | null => {
     if (!data || typeof data !== 'object') return null;
-
-    const accuracy = data.accuracy_score ?? data.accuracyScore;
-    if (accuracy === undefined) return null;
-
+    // Pass through all message types
     return {
+      type: data.type,
       transcript: data.transcript || '',
       feedback: data.feedback || '',
-      accuracyScore: Number(accuracy) || 0,
+      accuracyScore: Number(data.accuracy_score ?? data.accuracyScore ?? 0),
       corrections: Array.isArray(data.corrections) ? data.corrections : [],
       tips: Array.isArray(data.tips) ? data.tips : [],
       recordingUrl: data.recording_url || data.recordingUrl,
+      text: data.text || '',
+      visual: data.visual,
     };
   };
 
@@ -66,7 +67,16 @@ export function useWebSocket() {
         setError(null);
       };
 
+      ws.binaryType = 'arraybuffer';
+
       ws.onmessage = (event) => {
+        // Binary message = raw PCM audio from Gemini (16-bit, 24 kHz)
+        if (event.data instanceof ArrayBuffer) {
+          if (audioBytesHandlerRef.current) {
+            audioBytesHandlerRef.current(event.data);
+          }
+          return;
+        }
         try {
           const data = JSON.parse(event.data);
           const normalized = normalizeResponse(data);
@@ -140,6 +150,10 @@ export function useWebSocket() {
     messageHandlerRef.current = handler;
   }, []);
 
+  const setAudioBytesHandler = useCallback((handler: (pcmBytes: ArrayBuffer) => void) => {
+    audioBytesHandlerRef.current = handler;
+  }, []);
+
   const sendImageFrame = useCallback((base64Image: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(
@@ -152,13 +166,28 @@ export function useWebSocket() {
     }
   }, []);
 
+  const sendText = useCallback((text: string) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'text', text, timestamp: Date.now() }));
+    }
+  }, []);
+
+  const sendModeSwitch = useCallback((mode: string) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'mode_switch', mode, timestamp: Date.now() }));
+    }
+  }, []);
+
   return {
     isConnected,
     error,
     lastResponse,
     sendAudioChunk,
     sendImageFrame,
+    sendText,
+    sendModeSwitch,
     endSession,
     setMessageHandler,
+    setAudioBytesHandler,
   };
 }

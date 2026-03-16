@@ -1,0 +1,26 @@
+address,city,state,zip,price,sqft,bedrooms,bathrooms,year_built,lot_size_sqft,days_on_market,property_type,garage,pool,school_rating
+"123 Oak St","Austin","TX","78701",485000,1850,3,2,1998,6200,12,"Single Family",2,0,8
+"456 Elm Ave","Austin","TX","78702",620000,2200,4,3,2005,7800,5,"Single Family",2,1,9
+"789 Pine Rd","Austin","TX","78703",395000,1450,2,2,1985,5500,22,"Condo",1,0,7
+"321 Maple Dr","Austin","TX","78704",710000,2650,4,3,2012,9100,8,"Single Family",2,1,9
+"654 Cedar Ln","Austin","TX","78705",285000,1100,2,1,1972,4800,35,"Condo",0,0,6
+"987 Birch Blvd","Austin","TX","78706",540000,1980,3,2,2001,7200,18,"Single Family",2,0,8
+"147 Willow Way","Austin","TX","78707",890000,3200,5,4,2018,11500,3,"Single Family",3,1,10
+"258 Spruce St","Austin","TX","78708",445000,1720,3,2,1995,6600,14,"Single Family",2,0,7
+"369 Ash Ave","Austin","TX","78709",325000,1300,2,2,1989,5100,28,"Condo",1,0,7
+"741 Hickory Dr","Austin","TX","78710",675000,2450,4,3,2009,8700,7,"Single Family",2,1,9
+"852 Walnut Rd","Austin","TX","78711",520000,1900,3,2,2003,7000,16,"Single Family",2,0,8
+"963 Poplar Ln","Austin","TX","78712",780000,2850,4,4,2015,10200,4,"Single Family",3,1,9
+"159 Magnolia Blvd","Austin","TX","78713",365000,1400,2,2,1991,5300,31,"Condo",1,0,6
+"357 Dogwood Way","Austin","TX","78714",595000,2100,3,3,2007,7600,11,"Single Family",2,0,8
+"486 Sycamore St","Austin","TX","78715",430000,1650,3,2,1997,6400,20,"Single Family",2,0,7
+"624 Laurel Ave","Austin","TX","78716",830000,3050,5,4,2016,10800,6,"Single Family",3,1,10
+"753 Cypress Dr","Austin","TX","78717",490000,1820,3,2,2000,6900,13,"Single Family",2,0,8
+"861 Juniper Rd","Austin","TX","78718",310000,1200,2,1,1980,4900,40,"Condo",0,0,6
+"924 Redwood Ln","Austin","TX","78719",650000,2300,4,3,2010,8400,9,"Single Family",2,1,9
+"135 Chestnut Blvd","Austin","TX","78720",570000,2050,3,3,2004,7400,15,"Single Family",2,0,8
+"246 Pecan Way","Austin","TX","78721",920000,3400,5,4,2020,12000,2,"Single Family",3,1,10
+"357 Peach St","Austin","TX","78722",415000,1600,3,2,1993,6100,24,"Single Family",2,0,7
+"468 Plum Ave","Austin","TX","78723",740000,2700,4,3,2013,9500,7,"Single Family",2,1,9
+"579 Cherry Dr","Austin","TX","78724",355000,1380,2,2,1988,5200,33,"Condo",1,0,6
+"681 Apple Rd","Austin","TX","78725",605000,2150,3,3,2008,7800,10,"Single Family",2,0,8
